@@ -1,12 +1,18 @@
-var parent = function(prototype) { //父类的实例存放实例初始化和class初始化属性
+
+var f={};
+f.createClass=createClass;
+f.inherit=inherit;
+f.mixin=mixin;
+
+function parent(prototype) { //父类的实例存放实例初始化和class初始化属性
     for (var i in prototype) {
         if (prototype.hasOwnProperty(i)) {
             this[i] = prototype[i];
         }
     }
 };
-var plain = function() {};
-var createClass = function(prototype, __initIns, __initClass) {
+function plain() {};
+function createClass(prototype, __initIns, __initClass) {
 
     __initIns = __initIns || plain;
     __initClass = __initClass || plain;
@@ -30,7 +36,6 @@ var createClass = function(prototype, __initIns, __initClass) {
     f.prototype = fProto;
     return f;
 };
-
 function inherit(seed,another,initialize){
     var child= function(){
         another.apply(this,arguments);
@@ -40,28 +45,34 @@ function inherit(seed,another,initialize){
 
     var proto=new plain;
     plain.prototype=proto;
-    child.prototype=new plain;
-    for(var i in seed){
-        if(seed.hasOwnProperty(i)){
-            child[i]=seed[i];
+    proto=new plain;
+    child.prototype=proto;
+    mixin(proto,seed);
+    return child;
+}
+
+function mixin(des,src){
+    for(var i in src){
+        if(src.hasOwnProperty(i)){
+            des[i]=src[i];
         }
     }
-    return child;
 }
 
 function extend(seed,initialize){
     return inherit(seed,this,initialize);
 }
+
 var View=createClass({
     a:1,
     getA:function(){
         return this.a;
     }
-},function(){
-    this.b=2;
+},function(x){
+    this.b=x;
 },function(_class){
     _class.alert=alert;
 });
-var View2=View.extend({c:3},function(){
-    this.d=4;
+var View2=View.extend({c:3},function(x){
+    this.d=x;
 });
